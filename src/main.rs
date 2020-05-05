@@ -1,10 +1,18 @@
+mod notifier;
 mod proto;
 
-use tonic::{transport::Server, Request, Response, Status};
+use notifier::NotifierImpl;
+use proto::push::notifier_server::NotifierServer;
+use tonic::transport::Server;
 
-use proto::push::notifier_server::{Notifier, NotifierServer};
-// use proto::push::{SubscribeRequest, SubscribeResponse};
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let addr = "0.0.0.0:4000".parse()?;
 
-fn main() {
-    println!("Hello, world!");
+    Server::builder()
+        .add_service(NotifierServer::new(NotifierImpl::default()))
+        .serve(addr)
+        .await?;
+
+    Ok(())
 }
