@@ -1,6 +1,8 @@
-extern crate prost_build;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tonic_build::configure()
+        .build_client(false)
+        .out_dir("src/proto")
+        .compile(&["proto/notifier.proto"], &["proto"])?;
 
-fn main() {
-    prost_build::compile_protos(&["proto/events.proto"],
-                                &["proto/"]).unwrap();
+    Ok(())
 }
