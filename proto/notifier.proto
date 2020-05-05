@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package push;
+
+enum Platform {
+  UNDEFINED = 0;
+  IOS = 1;
+  ANDROID = 2;
+}
+
+message SubscribeRequest {
+  string topic = 1;
+  string device_id = 2;
+  Platform platform = 3;
+}
+
+message SubscribeResponse {
+  string subscription_id = 1;
+}
+
+service Notifier {
+  rpc Subscribe (SubscribeRequest) returns (SubscribeResponse);
+}
