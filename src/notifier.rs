@@ -1,6 +1,8 @@
 use crate::proto::push::notifier_server::Notifier;
-use crate::proto::push::{SubscribeRequest, SubscribeResponse};
-use tonic::{Request, Response, Status};
+use crate::proto::push::{Platform, SubscribeRequest, SubscribeResponse};
+
+use bytes::Bytes;
+use tonic::{Code, Request, Response, Status};
 
 #[derive(Debug, Default)]
 pub struct NotifierImpl {}
@@ -19,6 +21,17 @@ impl Notifier for NotifierImpl {
             subscription_id: String::from("blah blah"),
         };
 
-        Ok(Response::new(resp))
+        if request.into_inner().platform == Platform::Android.into() {
+            Err(Status::with_details(
+                Code::ResourceExhausted,
+                "Android users are limited to 0 requests per second.",
+                Bytes::new()
+                // Bytes::from_static(b"hello"),
+                // Bytes::from("sad"),
+                // Bytes::from_static(&[1, 1, 1, 255]),
+            ))
+        } else {
+            Ok(Response::new(resp))
+        }
     }
 }

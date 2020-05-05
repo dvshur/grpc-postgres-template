@@ -693,6 +693,7 @@ name = "srv1"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "bytes",
  "futures",
  "prost",
  "tokio",
