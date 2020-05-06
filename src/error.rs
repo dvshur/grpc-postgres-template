@@ -3,6 +3,7 @@
 
 #[derive(Debug)]
 pub enum Error {
+    _Unknown,
     LoadConfig(envy::Error),
     ParseAddress(std::net::AddrParseError),
     Transport(tonic::transport::Error),
@@ -14,6 +15,7 @@ use Error::*;
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
+            _Unknown => write!(f, "An unknown error occured"),
             LoadConfig(err) => err.fmt(f),
             Transport(err) => err.fmt(f),
             ParseAddress(err) => err.fmt(f),

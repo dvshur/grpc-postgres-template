@@ -1,4 +1,4 @@
-use crate::config::PgConfig;
+use crate::config::Config;
 use crate::proto::errors::error_detail::Value;
 use crate::proto::errors::{Error, ErrorDetail, ErrorResponse};
 
@@ -8,10 +8,10 @@ use prost::Message;
 use std::collections::HashMap;
 use tonic::Status;
 
-pub fn pg_url(config: &PgConfig) -> String {
+pub fn pg_url(config: &Config) -> String {
     format!(
         "postgres://{}:{}@{}/{}",
-        config.username, config.password, config.host, config.database
+        config.pguser, config.pgpassword, config.pghost, config.pgdatabase
     )
 }
 

@@ -2,32 +2,33 @@ use crate::error::*;
 use serde::Deserialize;
 
 fn default_port() -> u16 {
+    4000
+}
+
+fn default_pgport() -> u16 {
     5432
 }
 
-fn default_pool_size() -> u32 {
+fn default_pgpool() -> u32 {
     4
 }
 
-#[derive(Deserialize, Debug)]
-pub struct PgConfig {
-    #[serde(rename = "PGPOOL", default = "default_pool_size")]
-    pub pool_size: u32,
-    #[serde(rename = "PGHOST")]
-    pub host: String,
-    #[serde(rename = "PGPORT", default = "default_port")]
-    pub port: u16,
-    #[serde(rename = "PGDATABASE")]
-    pub database: String,
-    #[serde(rename = "PGUSER")]
-    pub username: String,
-    #[serde(rename = "PGUSER")]
-    pub password: String,
-}
+// nested non-string values are not supported due to issue
+// https://github.com/softprops/envy/issues/26
+// so using a simple flat config for now
+
 #[derive(Deserialize, Debug)]
 pub struct Config {
+    #[serde(default = "default_port")]
     pub port: u16,
-    pub pg: PgConfig,
+    #[serde(default = "default_pgpool")]
+    pub pgpool: u32,
+    pub pghost: String,
+    #[serde(default = "default_pgport")]
+    pub pgport: u16,
+    pub pgdatabase: String,
+    pub pguser: String,
+    pub pgpassword: String,
 }
 
 pub fn load() -> Result<Config, Error> {

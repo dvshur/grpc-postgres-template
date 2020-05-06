@@ -1,6 +1,7 @@
 mod config;
 mod error;
 mod proto;
+mod repo;
 mod service;
 mod util;
 
@@ -20,15 +21,17 @@ async fn main() -> Result<(), Error> {
 
     let addr = format!("0.0.0.0:{}", config.port).parse()?;
 
-    let _pool = PgPool::builder()
-        .max_size(config.pg.pool_size)
-        .build(&pg_url(&config.pg))
+    let pgpool = PgPool::builder()
+        .max_size(config.pgpool)
+        .build(&pg_url(&config))
         .await?;
+
+    let repo = repo::Repo::new(&pgpool);
 
     // It is possible to customize error details header using lower level workaround.
     // See hyper_warp example, as suggested in discord.
     Server::builder()
-        .add_service(NotifierServer::new(NotifierImpl::default()))
+        .add_service(NotifierServer::new(NotifierImpl::new(&repo)))
         .serve(addr)
         .await?;
 
