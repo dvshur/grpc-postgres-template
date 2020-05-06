@@ -1,13 +1,13 @@
+use crate::proto::errors::error_detail;
 use crate::proto::push::notifier_server::Notifier;
 use crate::proto::push::{Platform, SubscribeRequest, SubscribeResponse};
+use crate::status::with_details;
 
-use bytes::Bytes;
-use tonic::{Code, Request, Response, Status};
+use error_detail::Value;
+use tonic::{Request, Response, Status};
 
 #[derive(Debug, Default)]
 pub struct NotifierImpl {}
-
-// todo set headers/trailers on both failed and succesful requests
 
 #[tonic::async_trait]
 impl Notifier for NotifierImpl {
@@ -22,13 +22,14 @@ impl Notifier for NotifierImpl {
         };
 
         if request.into_inner().platform == Platform::Android.into() {
-            Err(Status::with_details(
-                Code::ResourceExhausted,
-                "Android users are limited to 0 requests per second.",
-                Bytes::new()
-                // Bytes::from_static(b"hello"),
-                // Bytes::from("sad"),
-                // Bytes::from_static(&[1, 1, 1, 255]),
+            Err(with_details(
+                Status::resource_exhausted("Android clients are limited to 0 requests per second"),
+                950000,
+                "Not a good day, mate",
+                &[(
+                    "reason",
+                    Value::String(String::from("It's april fool's day")),
+                )],
             ))
         } else {
             Ok(Response::new(resp))

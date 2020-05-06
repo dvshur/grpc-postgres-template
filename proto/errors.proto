@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package errors;
+
+message ErrorResponse {
+    repeated Error errors = 1;
+}
+
+message Error {
+    uint32 code = 1;
+    string message = 2;
+    map<string, ErrorDetail> details = 3;
+}
+
+message ErrorDetail {
+    oneof value {
+        string string = 1;
+        double double = 2;
+        int64 long = 3;
+        bytes binary = 4;
+    }
+}
