@@ -11,8 +11,8 @@ use sqlx::postgres::PgPool;
 use tonic::transport::Server;
 use util::pg_url;
 
-// todo validation
 // todo repo
+// todo validation
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
