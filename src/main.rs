@@ -4,16 +4,18 @@ mod proto;
 mod service;
 mod util;
 
+use error::*;
 use proto::push::notifier_server::NotifierServer;
 use service::NotifierImpl;
+use sqlx::postgres::PgPool;
 use tonic::transport::Server;
 use util::pg_url;
 
-use sqlx::postgres::PgPool;
+// todo validation
+// todo repo
 
-// todo proper error handling with custom (or derived) error types
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<(), Error> {
     let config = crate::config::load()?;
 
     let addr = format!("0.0.0.0:{}", config.port).parse()?;

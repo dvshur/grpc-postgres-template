@@ -1,36 +1,49 @@
-use crate::proto::errors::error_detail::Value;
-use crate::proto::errors::{Error, ErrorDetail, ErrorResponse};
+// manual boilerplate is here is to provide an example.
+// for production an error macro crate can be used
 
-use base64::encode;
-use bytes::Bytes;
-use prost::Message;
-use std::collections::HashMap;
-use tonic::Status;
+#[derive(Debug)]
+pub enum Error {
+    LoadConfig(envy::Error),
+    ParseAddress(std::net::AddrParseError),
+    Transport(tonic::transport::Error),
+    Database(sqlx::Error),
+}
 
-pub fn with_details(status: Status, code: u32, message: &str, details: &[(&str, Value)]) -> Status {
-    let mut d = HashMap::new();
+use Error::*;
 
-    for (k, v) in details {
-        d.insert(
-            k.to_string(),
-            ErrorDetail {
-                value: Some(v.clone()),
-            },
-        );
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            LoadConfig(err) => err.fmt(f),
+            Transport(err) => err.fmt(f),
+            ParseAddress(err) => err.fmt(f),
+            Database(err) => err.fmt(f),
+        }
     }
+}
 
-    let err = ErrorResponse {
-        errors: vec![Error {
-            code: code,
-            message: message.to_owned(),
-            details: d,
-        }],
-    };
+impl std::error::Error for Error {}
 
-    let mut buf = Vec::new();
+impl From<envy::Error> for Error {
+    fn from(e: envy::Error) -> Self {
+        LoadConfig(e)
+    }
+}
 
-    match err.encode(&mut buf) {
-        Ok(_) => Status::with_details(status.code(), status.message(), Bytes::from(encode(buf))),
-        Err(_) => Status::internal("Internal server error"),
+impl From<tonic::transport::Error> for Error {
+    fn from(e: tonic::transport::Error) -> Self {
+        Transport(e)
+    }
+}
+
+impl From<std::net::AddrParseError> for Error {
+    fn from(e: std::net::AddrParseError) -> Self {
+        ParseAddress(e)
+    }
+}
+
+impl From<sqlx::Error> for Error {
+    fn from(e: sqlx::Error) -> Self {
+        Database(e)
     }
 }

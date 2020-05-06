@@ -1,3 +1,4 @@
+use crate::error::*;
 use serde::Deserialize;
 
 fn default_port() -> u16 {
@@ -29,6 +30,6 @@ pub struct Config {
     pub pg: PgConfig,
 }
 
-pub fn load() -> Result<Config, envy::Error> {
-    envy::from_env::<Config>()
+pub fn load() -> Result<Config, Error> {
+    Ok(envy::from_env::<Config>()?)
 }

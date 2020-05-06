@@ -1,7 +1,7 @@
-use crate::error::with_details;
 use crate::proto::errors::error_detail;
 use crate::proto::push::notifier_server::Notifier;
 use crate::proto::push::{Platform, SubscribeRequest, SubscribeResponse};
+use crate::util::with_details;
 
 use error_detail::Value;
 use tonic::{Request, Response, Status};
